@@ -28,6 +28,7 @@ class TypeMapper
             case 'bigint':
             case 'int':
                 return 'int';
+            case 'double':
             case 'decimal':
                 return 'float';
             case 'char':

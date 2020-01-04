@@ -15,7 +15,7 @@ class {{ entity.table|entity_name }}
 {
 {% for column in entity.columns %}
     /**
-     * @var {{ column|php_type(true) }}{{ column.nullable ? '|null' }}
+     * @var {{ column|php_type(true) }}
 {% if column.isId %}
      *
      * @ORM\Id
@@ -58,7 +58,7 @@ class {{ entity.table|entity_name }}
     }
 
 {% for column in entity.columns %}
-    public function {{ column|php_type == 'bool' ? 'is' : 'get' }}{{ column.name|camelize|ucfirst }}(): {{ column|php_type }}
+    public function {{ (column|php_type in ['bool', '?bool'] ) ? (column.name[0:2] == 'is' ? '' : 'is') : 'get' }}{{ column.name|camelize|ucfirst }}(): {{ column|php_type }}
     {
         return $this->{{ column.name|camelize }};
     }
@@ -83,7 +83,7 @@ class {{ entity.table|entity_name }}
 
 {% else %}
     /**
-     * @return {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>
+     * @return {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>|\{{ namespace }}\{{ reference.table|entity_name }}[]
      */
     public function get{{ reference.table|camelize|ucfirst|pluralize }}(): {{ collectionClass }}
     {
