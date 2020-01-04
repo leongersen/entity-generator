@@ -35,7 +35,7 @@ class Generator
          */
         foreach ($entities as $table => $entity) {
             foreach ($entity->getReferences() as $reference) {
-                if ($reference->isOwningSide() && $table !== $reference->getTable()) {
+                if ($reference->isOwningSide()) {
                     /** @var Entity $referencedEntity */
                     $referencedEntity = $entities[$reference->getTable()];
                     $referencedEntity->addReference($reference->invert($table));

@@ -24,9 +24,11 @@ class Renderer
         $pluralize = new TwigFilter('pluralize', [Namer::class, 'pluralize']);
 
         $phpTypeFilter = new TwigFilter('php_type', [TypeMapper::class, 'phpType']);
+        $doctrineTypeFilter = new TwigFilter('doctrine_type', [TypeMapper::class, 'doctrineType']);
         $ucfirst = new TwigFilter('ucfirst', 'ucfirst');
 
         $this->twig->addFilter($phpTypeFilter);
+        $this->twig->addFilter($doctrineTypeFilter);
         $this->twig->addFilter($camelizeFilter);
         $this->twig->addFilter($entityNameFilter);
         $this->twig->addFilter($relate);

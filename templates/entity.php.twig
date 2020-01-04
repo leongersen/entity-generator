@@ -24,7 +24,7 @@ class {{ entity.table|entity_name }}
      * @ORM\GeneratedValue(strategy="IDENTITY")
 {% endif %}
      *
-     * @ORM\Column(name="{{ column.name }}", type="{{ column.type }}",{{ column.length ? ' length=' ~ column.length ~ ',' }}{{ column.precision ? ' precision=' ~ column.precision ~ ',' }}{{ column.scale ? ' scale=' ~ column.scale ~ ',' }} nullable={{ column.nullable ? 'true' : 'false'}}, options={ {{ column.unsigned ? '"unsigned": true' }} })
+     * @ORM\Column(name="{{ column.name }}", type="{{ column|doctrine_type }}",{{ column.length ? ' length=' ~ column.length ~ ',' }}{{ column.precision ? ' precision=' ~ column.precision ~ ',' }}{{ column.scale ? ' scale=' ~ column.scale ~ ',' }} nullable={{ column.nullable ? 'true' : 'false'}}, options={ {{ column.unsigned ? '"unsigned": true' }} })
      */
     private ${{ column.name|camelize }};
 
@@ -32,7 +32,8 @@ class {{ entity.table|entity_name }}
 {% for reference in entity.references %}
 {% if reference.owningSide %}
     /**
-     * @ORM\OneToMany(targetEntity="{{ reference.table|entity_name }}", mappedBy="{{ reference.table|camelize|pluralize }}")
+     * @ORM\ManyToOne(targetEntity="{{ reference.table|entity_name }}", inversedBy="{{ entity.table|camelize|pluralize }}")
+     * @ORM\JoinColumn(name="{{ reference.column }}", referencedColumnName="{{ reference.referencedColumn }}")
      *
      * @var \{{ namespace }}\{{ reference.table|entity_name }}{{ reference.nullable ? '|null' }}
      */
@@ -40,7 +41,7 @@ class {{ entity.table|entity_name }}
 
 {% else %}
     /**
-     * @ORM\ManyToOne(targetEntity="{{ reference.table|entity_name }}", inversedBy="{{ reference.referencedColumn|relate|camelize|pluralize }}")
+     * @ORM\OneToMany(targetEntity="{{ reference.table|entity_name }}", mappedBy="{{ reference.referencedColumn|relate|camelize }}")
      *
      * @var {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>
      */
