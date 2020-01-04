@@ -36,6 +36,7 @@ class TypeMapper
             case 'mediumtext':
             case 'longtext':
                 return 'string';
+            case 'timestamp':
             case 'date':
             case 'datetime':
                 return '\\DateTime';
