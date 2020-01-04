@@ -25,7 +25,7 @@ class PdoDriver implements DriverInterface
      */
     public function getTables(): iterable
     {
-        $statement = $this->pdo->prepare('SELECT TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA = ?');
+        $statement = $this->pdo->prepare('SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_TYPE = "BASE TABLE" AND TABLE_SCHEMA = ?');
         $statement->execute([$this->schema]);
 
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
@@ -33,6 +33,8 @@ class PdoDriver implements DriverInterface
 
     public function getCreateStatement(string $tableName): string
     {
-        return $this->pdo->query('SHOW CREATE TABLE ' . $tableName)->fetch()['Create Table'];
+        $createTable = $this->pdo->query('SHOW CREATE TABLE ' . $tableName)->fetch();
+
+        return $createTable['Create Table'];
     }
 }
