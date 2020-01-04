@@ -1,0 +1,123 @@
+{# entity \EntityGenerator\Generator\Entity #}
+{# namespace string #}
+{# collectionClass string #}
+<?php
+
+namespace {{ namespace }};
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Table(name="{{ entity.table }}")
+ * @ORM\Entity
+ */
+class {{ entity.table|entity_name }}
+{
+{% for column in entity.columns %}
+    /**
+     * @var {{ column|php_type(true) }}{{ column.nullable ? '|null' }}
+{% if column.isId %}
+     *
+     * @ORM\Id
+{% endif %}
+{% if column.isId and column.isGenerated %}
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+{% endif %}
+     *
+     * @ORM\Column(name="{{ column.name }}", type="{{ column.type }}",{{ column.length ? ' length=' ~ column.length ~ ',' }}{{ column.precision ? ' precision=' ~ column.precision ~ ',' }}{{ column.scale ? ' scale=' ~ column.scale ~ ',' }} nullable={{ column.nullable ? 'true' : 'false'}}, options={ {{ column.unsigned ? '"unsigned": true' }} })
+     */
+    private ${{ column.name|camelize }};
+
+{% endfor %}
+{% for reference in entity.references %}
+{% if reference.owningSide %}
+    /**
+     * @ORM\OneToMany(targetEntity="{{ reference.table|entity_name }}", mappedBy="{{ reference.table|camelize|pluralize }}")
+     *
+     * @var \{{ namespace }}\{{ reference.table|entity_name }}{{ reference.nullable ? '|null' }}
+     */
+    private ${{ reference.column|relate|camelize }};
+
+{% else %}
+    /**
+     * @ORM\ManyToOne(targetEntity="{{ reference.table|entity_name }}", inversedBy="{{ reference.referencedColumn|relate|camelize|pluralize }}")
+     *
+     * @var {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>
+     */
+    private ${{ reference.table|camelize|pluralize }};
+
+{% endif %}
+{% endfor %}
+    public function __construct()
+    {
+{% for reference in entity.references %}
+{% if not reference.owningSide %}
+        $this->{{ reference.table|camelize|pluralize }} = {{ collectionClass }}();
+{% endif %}
+{% endfor %}
+    }
+
+{% for column in entity.columns %}
+    public function {{ column|php_type == 'bool' ? 'is' : 'get' }}{{ column.name|camelize|ucfirst }}(): {{ column|php_type }}
+    {
+        return $this->{{ column.name|camelize }};
+    }
+
+    public function set{{ column.name|camelize|ucfirst }}({{ column|php_type }} ${{ column.name|camelize }}): void
+    {
+        $this->{{ column.name|camelize }} = ${{ column.name|camelize }};
+    }
+
+{% endfor %}
+{% for reference in entity.references %}
+{% if reference.owningSide %}
+    public function get{{ reference.column|relate|camelize|ucfirst }}(): {{ reference.nullable ? '?' }}\{{ namespace }}\{{ reference.table|entity_name }}
+    {
+        return $this->{{ reference.column|relate|camelize }};
+    }
+
+    public function set{{ reference.column|relate|camelize|ucfirst }}({{ reference.nullable ? '?' }}\{{ namespace }}\{{ reference.table|entity_name }} ${{ reference.column|relate|camelize }}): void
+    {
+        $this->{{ reference.column|relate|camelize }} = ${{ reference.column|relate|camelize }};
+    }
+
+{% else %}
+    /**
+     * @return {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>
+     */
+    public function get{{ reference.table|camelize|ucfirst|pluralize }}(): {{ collectionClass }}
+    {
+        return $this->{{ reference.table|camelize|pluralize }};
+    }
+
+    /**
+     * @param {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>|\{{ namespace }}\{{ reference.table|entity_name }}[]
+     */
+    public function set{{ reference.table|camelize|ucfirst|pluralize }}(iterable ${{ reference.table|camelize|pluralize }}): void
+    {
+        if (\is_array(${{ reference.table|camelize|pluralize }})) {
+            ${{ reference.table|camelize|pluralize }} = new {{ collectionClass }}(${{ reference.table|camelize|pluralize }});
+        }
+
+        $this->{{ reference.table|camelize|pluralize }} = ${{ reference.table|camelize|pluralize }};
+    }
+
+    /**
+    * @param {{ reference.table|entity_name }}
+    */
+    public function add{{ reference.table|camelize|ucfirst }}(\{{ namespace }}\{{ reference.table|entity_name }} ${{ reference.table|camelize }}): void
+    {
+        $this->{{ reference.table|camelize|pluralize }}->add(${{ reference.table|camelize }});
+    }
+
+    /**
+    * @param {{ reference.table|entity_name }}
+    */
+    public function remove{{ reference.table|camelize|ucfirst }}(\{{ namespace }}\{{ reference.table|entity_name }} ${{ reference.table|camelize }}): void
+    {
+        $this->{{ reference.table|camelize|pluralize }}->removeElement(${{ reference.table|camelize }});
+    }
+
+{% endif %}
+{% endfor %}
+}
