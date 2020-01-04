@@ -52,7 +52,7 @@ class {{ entity.table|entity_name }}
     {
 {% for reference in entity.references %}
 {% if not reference.owningSide %}
-        $this->{{ reference.table|camelize|pluralize }} = {{ collectionClass }}();
+        $this->{{ reference.table|camelize|pluralize }} = new {{ collectionClass }}();
 {% endif %}
 {% endfor %}
     }
