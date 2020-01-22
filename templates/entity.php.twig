@@ -1,6 +1,7 @@
 {# entity \EntityGenerator\Generator\Entity #}
 {# namespace string #}
-{# collectionClass string #}
+{# collectionInterface string #}
+{# collectionImplementation string #}
 <?php
 
 namespace {{ namespace }};
@@ -43,7 +44,7 @@ class {{ entity.table|entity_name }}
     /**
      * @ORM\OneToMany(targetEntity="{{ reference.table|entity_name }}", mappedBy="{{ reference.referencedColumn|relate|camelize }}")
      *
-     * @var {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>
+     * @var {{ collectionInterface }}<\{{ namespace }}\{{ reference.table|entity_name }}>
      */
     private ${{ reference.table|camelize|pluralize }};
 
@@ -53,7 +54,7 @@ class {{ entity.table|entity_name }}
     {
 {% for reference in entity.references %}
 {% if not reference.owningSide %}
-        $this->{{ reference.table|camelize|pluralize }} = new {{ collectionClass }}();
+        $this->{{ reference.table|camelize|pluralize }} = new {{ collectionImplementation }}();
 {% endif %}
 {% endfor %}
     }
@@ -84,20 +85,20 @@ class {{ entity.table|entity_name }}
 
 {% else %}
     /**
-     * @return {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>|\{{ namespace }}\{{ reference.table|entity_name }}[]
+     * @return {{ collectionInterface }}<\{{ namespace }}\{{ reference.table|entity_name }}>|\{{ namespace }}\{{ reference.table|entity_name }}[]
      */
-    public function get{{ reference.table|camelize|ucfirst|pluralize }}(): {{ collectionClass }}
+    public function get{{ reference.table|camelize|ucfirst|pluralize }}(): {{ collectionInterface }}
     {
         return $this->{{ reference.table|camelize|pluralize }};
     }
 
     /**
-     * @param {{ collectionClass }}<\{{ namespace }}\{{ reference.table|entity_name }}>|\{{ namespace }}\{{ reference.table|entity_name }}[]
+     * @param {{ collectionInterface }}<\{{ namespace }}\{{ reference.table|entity_name }}>|\{{ namespace }}\{{ reference.table|entity_name }}[]
      */
     public function set{{ reference.table|camelize|ucfirst|pluralize }}(iterable ${{ reference.table|camelize|pluralize }}): void
     {
         if (\is_array(${{ reference.table|camelize|pluralize }})) {
-            ${{ reference.table|camelize|pluralize }} = new {{ collectionClass }}(${{ reference.table|camelize|pluralize }});
+            ${{ reference.table|camelize|pluralize }} = new {{ collectionImplementation }}(${{ reference.table|camelize|pluralize }});
         }
 
         $this->{{ reference.table|camelize|pluralize }} = ${{ reference.table|camelize|pluralize }};

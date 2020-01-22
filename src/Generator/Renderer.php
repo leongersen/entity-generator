@@ -36,12 +36,13 @@ class Renderer
         $this->twig->addFilter($pluralize);
     }
 
-    public function render(Entity $entity, string $namespace, string $collectionClass): string
+    public function render(Entity $entity, string $namespace, string $collectionInterface, string $collectionImplementation): string
     {
         return $this->twig->render('entity.php.twig', [
             'namespace' => $namespace,
             'entity' => $entity,
-            'collectionClass' => $collectionClass
+            'collectionInterface' => $collectionInterface,
+            'collectionImplementation' => $collectionImplementation,
         ]);
     }
 }

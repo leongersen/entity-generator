@@ -24,13 +24,15 @@ class GenerateEntitiesCommand extends Command
             ->addOption('dsn', null, InputOption::VALUE_REQUIRED, 'DSN', getenv('DATABASE_URL'))
             ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Namespace', 'App\\Entity')
             ->addOption('directory', null, InputOption::VALUE_REQUIRED, 'Output directory', 'src\\Entity')
-            ->addOption('collection', null, InputOption::VALUE_REQUIRED, 'Collection class', '\\Doctrine\\Common\\Collections\\ArrayCollection');
+            ->addOption('collection-implementation', null, InputOption::VALUE_REQUIRED, 'Collection implementation', '\\Doctrine\\Common\\Collections\\ArrayCollection')
+            ->addOption('collection-interface', null, InputOption::VALUE_REQUIRED, 'Collection interface', '\\Doctrine\\Common\\Collections\\Collection');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $namespace = $input->getOption('namespace');
-        $collectionClass = $input->getOption('collection');
+        $collectionImplementation = $input->getOption('collection-implementation');
+        $collectionInterface = $input->getOption('collection-interface');
         $outputDirection = $input->getOption('directory');
 
         // TODO - When adding additional drivers/mappers, this will need to be done in a factory
@@ -47,7 +49,7 @@ class GenerateEntitiesCommand extends Command
         /** @var Entity $entity */
         foreach ($generator->generateEntities() as $entity) {
             $fileName = $outputDirection . '/' . Namer::entityName($entity->getTable()) . '.php';
-            $class = $renderer->render($entity, $namespace, $collectionClass);
+            $class = $renderer->render($entity, $namespace, $collectionInterface, $collectionImplementation);
             $filesystem->dumpFile($fileName, $class);
         }
 
