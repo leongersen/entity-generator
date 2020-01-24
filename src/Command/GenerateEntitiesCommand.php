@@ -21,7 +21,7 @@ class GenerateEntitiesCommand extends Command
     {
         $this
             ->setName('entity-generator:generate')
-            ->addOption('dsn', null, InputOption::VALUE_REQUIRED, 'DSN', getenv('DATABASE_URL'))
+            ->addOption('dsn', null, InputOption::VALUE_REQUIRED, 'DSN')
             ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Namespace', 'App\\Entity')
             ->addOption('directory', null, InputOption::VALUE_REQUIRED, 'Output directory', 'src\\Entity')
             ->addOption('collection-implementation', null, InputOption::VALUE_REQUIRED, 'Collection implementation', '\\Doctrine\\Common\\Collections\\ArrayCollection')
@@ -30,13 +30,18 @@ class GenerateEntitiesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
+        $dsnInput = $input->getOption('dsn');
         $namespace = $input->getOption('namespace');
         $collectionImplementation = $input->getOption('collection-implementation');
         $collectionInterface = $input->getOption('collection-interface');
         $outputDirection = $input->getOption('directory');
 
+        if (!$dsnInput) {
+            throw new \InvalidArgumentException('A DSN is required');
+        }
+
         // TODO - When adding additional drivers/mappers, this will need to be done in a factory
-        $dsn = new DSN($input->getOption('dsn'));
+        $dsn = new DSN($dsnInput);
         $driver = new PdoDriver($dsn);
         $mapper = new MySqlMapper();
 

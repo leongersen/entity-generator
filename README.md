@@ -15,14 +15,21 @@ This project is licensed [MIT](https://choosealicense.com/licenses/mit/) and can
 
 ## Usage
 ```shell script
-vendor/bin/entity-generator entity-generator:generate
+bin/entity-generator entity-generator:generate
 ```
 
 ### Options
-- `dsn` (Defaults to the `DATABASE_URL` environment variable, so can be omitted if Doctrine is configured)
+- `dsn` Accepts the same format as Doctrine, so the value configured in `.env` can be used
 - `namespace` Namespace for the generated entities (Default `App\Entity`)
 - `directory` Output directory for the generated entities (Default `src/Entity`)
-- `collection` Classname for the collection type to use in the generated entities (Default `\Doctrine\Common\Collections\ArrayCollection`)
+- `collection-interface` Interface name for the collection type to use in the generated entities (Default `\Doctrine\Common\Collections\Collection`)
+- `collection-implementation` (Default `\Doctrine\Common\Collections\ArrayCollection`)
+
+### Using a DSN from a .env file 
+```shell script
+source .env
+bin/entity-generator entity-generator:generate --dsn $DATABASE_URL
+```
 
 ## Implementation
 - A mapping is generated from an existing database using `SHOW CREATE TABLE`.
